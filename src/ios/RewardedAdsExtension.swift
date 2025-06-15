@@ -24,7 +24,13 @@ extension YandexAdsPlugin {
             return;
         }
 
-        self.rewardedAd?.show(from: viewController)
+        // Fix for iOS 17+ compatibility - proper root view controller handling
+        guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else {
+            self.sendError(command: command, code: "no_root_view_controller", message: "No root view controller found");
+            return;
+        }
+
+        self.rewardedAd?.show(from: rootViewController)
 
         self.sendResult(command: command);
     }

@@ -1,19 +1,37 @@
 cdvPluginPostBuildExtras.add({
     android {
-      compileOptions {
-          sourceCompatibility JavaVersion.VERSION_1_8
-          targetCompatibility JavaVersion.VERSION_1_8
-      }
-      buildToolsVersion "33.0.2"
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
+        compileSdkVersion 35
+        buildToolsVersion "35.0.0"
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
     }
 
     dependencies {
         implementation fileTree(dir: 'libs', include: ['*.jar'])
-        implementation 'com.yandex.android:mobileads:7.0.0'
-        implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
-//         implementation 'com.yandex.android:mobmetricalib:5.2.0'
-//
-//         implementation 'com.yandex.ads.mediation:mobileads-mytarget:5.15.0.0'
-//         implementation 'com.my.target:mytarget-sdk:5.15.0'
+        
+        // Updated Yandex Mobile Ads SDK 7.12+ for +11% revenue boost
+        // Includes: DivKit updates, video previews, new banner designs, 60+ DSPs
+        implementation 'com.yandex.android:mobileads:7.12.0'
+        implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+        
+        // AndroidX dependencies (replaces deprecated support libraries)
+        implementation 'androidx.core:core:1.13.1'
+        implementation 'androidx.recyclerview:recyclerview:1.3.2'
+        implementation 'androidx.appcompat:appcompat:1.7.0'
+        
+        // Optional mediation adapters for higher fill rates
+        // Uncomment if using specific networks:
+        // implementation 'com.yandex.ads.mediation:mobileads-mytarget:5.21.7.0'
+        // implementation 'com.my.target:mytarget-sdk:5.21.7'
     }
 });
