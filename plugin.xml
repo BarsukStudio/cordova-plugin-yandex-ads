@@ -24,8 +24,6 @@
             <feature name="YandexAdsPlugin">
                 <param name="android-package" value="io.luzh.cordova.plugin.YandexAdsPlugin" />
             </feature>
-            <preference name="android-gradleVersion" value="8.4" />
-            <preference name="android-minSdkVersion" value="22" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
