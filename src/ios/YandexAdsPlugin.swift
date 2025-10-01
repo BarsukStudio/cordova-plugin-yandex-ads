@@ -35,7 +35,7 @@ class YandexAdsPlugin: CDVPlugin {
         configureDefaults()
     }
 
-    required init!(webViewEngine theWebViewEngine: WKWebView!) {
+    required override init!(webViewEngine theWebViewEngine: WKWebView!) {
         super.init(webViewEngine: theWebViewEngine)
         configureDefaults()
     }
