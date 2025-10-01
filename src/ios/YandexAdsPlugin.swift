@@ -1,4 +1,5 @@
 import Foundation
+import WebKit
 
 import YandexMobileAds
 
@@ -29,7 +30,15 @@ class YandexAdsPlugin: CDVPlugin {
 
     override init() {
         super.init()
+        configureDefaults()
+    }
 
+    required init!(webViewEngine theWebViewEngine: WKWebView!) {
+        super.init(webViewEngine: theWebViewEngine)
+        configureDefaults()
+    }
+
+    private func configureDefaults() {
         self.bannerAtTop = false
         self.bannerReloaded = false
     }
