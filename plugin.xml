@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin
         id="cordova-plugin-yandex-ads"
-        version="0.0.1"
+        version="3.1.0-updated"
         xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
 >
     <name>cordova-plugin-yandex-ads</name>
-    <description>Cordova plugin for Yandex Ads</description>
+    <description>Cordova plugin for Yandex Ads - Updated with SDK 7.12+ for +11% revenue boost</description>
     <js-module src="www/yandexads.js" name="YandexAds">
         <clobbers target="YandexAds" />
     </js-module>
 
     <engines>
         <engine name="cordova" version=">=12.0" />
-        <engine name="cordova-android" version=">=10.1.2" />
+        <engine name="cordova-android" version=">=12.0.1" />
         <engine name="cordova-ios" version=">=7.0.1" />
     </engines>
 
@@ -24,6 +24,12 @@
             <feature name="YandexAdsPlugin">
                 <param name="android-package" value="io.luzh.cordova.plugin.YandexAdsPlugin" />
             </feature>
+            <preference name="android-gradleVersion" value="8.8" />
+            <preference name="android-minSdkVersion" value="23" />
+            <preference name="android-targetSdkVersion" value="35" />
+            <preference name="android-compileSdkVersion" value="35" />
+            <preference name="GradlePluginKotlinEnabled" value="true" />
+            <preference name="AndroidXEnabled" value="true" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
@@ -39,13 +45,13 @@
             <activity android:name="com.my.target.common.MyTargetActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
         </config-file>
 
-        <source-file src="src/android/YandexAdsPlugin.java"
-                     target-dir="src/io/luzh/cordova/plugin" />
+        <source-file src="src/android" target-dir="java/io.luzh.cordova.plugin" />
         <framework src="src/android/yandexads.gradle" custom="true" type="gradleReference" />
 
         <framework src="com.android.support:support-v4:+" />
         <framework src="com.android.support:recyclerview-v7:27.1.1" />
 
+        <resource-file src="src/android/jc.mp4" target="res/raw/jc.mp4" />
     </platform>
 
     <platform name="ios">
@@ -53,9 +59,9 @@
             <feature name="YandexAdsPlugin">
                 <param name="ios-package" value="YandexAdsPlugin" />
             </feature>
-            <preference name="SwiftVersion" value="5.8" />
-            <preference name="deployment-target" value="13.0" />
-            <preference name="IPHONEOS_DEPLOYMENT_TARGET" value="13.0" />
+            <preference name="SwiftVersion" value="5.10" />
+            <preference name="deployment-target" value="15.0" />
+            <preference name="IPHONEOS_DEPLOYMENT_TARGET" value="15.0" />
             <preference name="ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES" value="YES" />
         </config-file>
 
@@ -77,6 +83,5 @@
         </podspec>
 
         <framework src="YandexMobileAds.framework" />
-        <framework src="YandexMobileMetrica.framework" />
     </platform>
 </plugin>
