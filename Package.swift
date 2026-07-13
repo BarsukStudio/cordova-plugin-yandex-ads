@@ -19,7 +19,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "YandexMobileAdsPackage", package: "yandex-ads-sdk-ios")
+                .product(name: "YandexMobileAds", package: "yandex-ads-sdk-ios")
             ],
             path: "ios/Sources/YandexAdsPlugin"),
         .testTarget(

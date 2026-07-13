@@ -4,6 +4,7 @@ Native Capacitor 8 plugin for Yandex Mobile Ads SDK 8.2.0 on Android and iOS.
 
 Supported in the first release:
 
+- sticky banner ads;
 - interstitial ads;
 - rewarded ads;
 - load/show lifecycle events;
@@ -52,6 +53,7 @@ await YandexAds.initialize({
   locationTracking: false,
 });
 
+await YandexAds.showBanner({ adUnitId: 'demo-banner-yandex' });
 await YandexAds.prepareInterstitial({ adUnitId: 'demo-interstitial-yandex' });
 await YandexAds.showInterstitial();
 
@@ -71,6 +73,8 @@ The web implementation reports the plugin as unavailable. Route browser builds t
 * [`setUserConsent(...)`](#setuserconsent)
 * [`setAgeRestricted(...)`](#setagerestricted)
 * [`setLocationTracking(...)`](#setlocationtracking)
+* [`showBanner(...)`](#showbanner)
+* [`removeBanner()`](#removebanner)
 * [`prepareInterstitial(...)`](#prepareinterstitial)
 * [`isInterstitialReady()`](#isinterstitialready)
 * [`showInterstitial()`](#showinterstitial)
@@ -139,6 +143,30 @@ setLocationTracking(options: BooleanValue) => Promise<void>
 | Param         | Type                                                  |
 | ------------- | ----------------------------------------------------- |
 | **`options`** | <code><a href="#booleanvalue">BooleanValue</a></code> |
+
+--------------------
+
+
+### showBanner(...)
+
+```typescript
+showBanner(options: AdLoadOptions) => Promise<BannerResult>
+```
+
+| Param         | Type                                                    |
+| ------------- | ------------------------------------------------------- |
+| **`options`** | <code><a href="#adloadoptions">AdLoadOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#bannerresult">BannerResult</a>&gt;</code>
+
+--------------------
+
+
+### removeBanner()
+
+```typescript
+removeBanner() => Promise<void>
+```
 
 --------------------
 
@@ -293,6 +321,14 @@ removeAllListeners() => Promise<void>
 | **`value`** | <code>boolean</code> |
 
 
+#### BannerResult
+
+| Prop         | Type                |
+| ------------ | ------------------- |
+| **`width`**  | <code>number</code> |
+| **`height`** | <code>number</code> |
+
+
 #### AdLoadOptions
 
 | Prop           | Type                |
@@ -342,6 +378,6 @@ removeAllListeners() => Promise<void>
 
 #### YandexAdsEventName
 
-<code>'interstitialLoaded' | 'interstitialShown' | 'interstitialClicked' | 'interstitialImpression' | 'interstitialDismissed' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedLoaded' | 'rewardedShown' | 'rewardedClicked' | 'rewardedImpression' | 'rewardedDismissed' | 'rewardedFailedToLoad' | 'rewardedFailedToShow' | 'rewarded'</code>
+<code>'bannerLoaded' | 'bannerClicked' | 'bannerImpression' | 'bannerFailedToLoad' | 'interstitialLoaded' | 'interstitialShown' | 'interstitialClicked' | 'interstitialImpression' | 'interstitialDismissed' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedLoaded' | 'rewardedShown' | 'rewardedClicked' | 'rewardedImpression' | 'rewardedDismissed' | 'rewardedFailedToLoad' | 'rewardedFailedToShow' | 'rewarded'</code>
 
 </docgen-api>

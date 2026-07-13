@@ -1,5 +1,8 @@
 package com.barsukstudio.plugins.yandexads
 
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -10,6 +13,9 @@ import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.common.YandexAds
+import com.yandex.mobile.ads.banner.BannerAdEventListener
+import com.yandex.mobile.ads.banner.BannerAdSize
+import com.yandex.mobile.ads.banner.BannerAdView
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
@@ -24,6 +30,10 @@ import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 class YandexAdsPlugin : Plugin() {
     private var initialized = false
     private var initializingCall: PluginCall? = null
+
+    private var bannerAdView: BannerAdView? = null
+    private var bannerAdUnitId = ""
+    private var bannerLoadCall: PluginCall? = null
 
     private var interstitialAdLoader: InterstitialAdLoader? = null
     private var interstitialAd: InterstitialAd? = null
@@ -67,6 +77,67 @@ class YandexAdsPlugin : Plugin() {
 
     @PluginMethod
     fun setLocationTracking(call: PluginCall) = setBoolean(call, YandexAds::setLocationTracking)
+
+    @PluginMethod
+    fun showBanner(call: PluginCall) = runOnMainThread {
+        val adUnitId = requireAdUnitId(call) ?: return@runOnMainThread
+        if (!requireInitialized(call)) return@runOnMainThread
+        if (bannerLoadCall != null) {
+            call.reject("A banner load is already in progress", "LOAD_IN_PROGRESS")
+            return@runOnMainThread
+        }
+        val currentActivity = activity
+        if (currentActivity == null) {
+            call.reject("Android Activity is unavailable", "ACTIVITY_UNAVAILABLE")
+            return@runOnMainThread
+        }
+
+        destroyBannerAd()
+        bannerAdUnitId = adUnitId
+        bannerLoadCall = call
+        val bannerSize = BannerAdSize.sticky(context, context.resources.configuration.screenWidthDp)
+        val banner = BannerAdView(context).apply {
+            setAdSize(bannerSize)
+            setBannerAdEventListener(object : BannerAdEventListener {
+                override fun onAdLoaded() {
+                    val result = bannerResult(bannerAdUnitId, bannerSize)
+                    notifyListeners("bannerLoaded", result)
+                    bannerLoadCall?.resolve(result)
+                    bannerLoadCall = null
+                }
+
+                override fun onAdFailedToLoad(error: AdRequestError) {
+                    val event = errorEvent(bannerAdUnitId, error.code, error.description)
+                    notifyListeners("bannerFailedToLoad", event)
+                    bannerLoadCall?.reject(error.description, "BANNER_LOAD_FAILED")
+                    bannerLoadCall = null
+                    destroyBannerAd()
+                }
+
+                override fun onAdClicked() = notifyListeners("bannerClicked", adEvent(bannerAdUnitId))
+                override fun onImpression(impressionData: ImpressionData?) =
+                    notifyListeners("bannerImpression", adEvent(bannerAdUnitId))
+            })
+        }
+        bannerAdView = banner
+        currentActivity.addContentView(
+            banner,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+            ),
+        )
+        banner.loadAd(AdRequest.Builder(adUnitId).build())
+    }
+
+    @PluginMethod
+    fun removeBanner(call: PluginCall) = runOnMainThread {
+        bannerLoadCall?.reject("Banner was removed", "BANNER_REMOVED")
+        bannerLoadCall = null
+        destroyBannerAd()
+        call.resolve()
+    }
 
     @PluginMethod
     fun prepareInterstitial(call: PluginCall) = runOnMainThread {
@@ -212,16 +283,19 @@ class YandexAdsPlugin : Plugin() {
 
     override fun handleOnDestroy() {
         runOnMainThread {
+            bannerLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             interstitialLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             rewardedLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             initializingCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             interstitialLoadCall = null
             rewardedLoadCall = null
+            bannerLoadCall = null
             initializingCall = null
             interstitialAdLoader?.cancelLoading()
             rewardedAdLoader?.cancelLoading()
             interstitialAdLoader = null
             rewardedAdLoader = null
+            destroyBannerAd()
             destroyInterstitialAd()
             destroyRewardedAd()
         }
@@ -250,6 +324,11 @@ class YandexAdsPlugin : Plugin() {
 
     private fun versionResult() = JSObject().put("version", YandexAds.libraryVersion)
     private fun adEvent(adUnitId: String) = JSObject().put("adUnitId", adUnitId)
+    private fun bannerResult(adUnitId: String, bannerSize: BannerAdSize) = JSObject().apply {
+        put("adUnitId", adUnitId)
+        put("width", bannerSize.width)
+        put("height", bannerSize.height)
+    }
     private fun errorEvent(adUnitId: String, code: Int?, message: String) = JSObject().apply {
         put("adUnitId", adUnitId)
         code?.let { put("code", it) }
@@ -259,6 +338,13 @@ class YandexAdsPlugin : Plugin() {
     private fun destroyInterstitialAd() {
         interstitialAd?.setAdEventListener(null)
         interstitialAd = null
+    }
+
+    private fun destroyBannerAd() {
+        bannerAdView?.setBannerAdEventListener(null)
+        (bannerAdView?.parent as? ViewGroup)?.removeView(bannerAdView)
+        bannerAdView?.destroy()
+        bannerAdView = null
     }
 
     private fun destroyRewardedAd() {

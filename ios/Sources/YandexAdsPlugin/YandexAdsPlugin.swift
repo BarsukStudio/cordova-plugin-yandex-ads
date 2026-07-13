@@ -1,5 +1,6 @@
 import Capacitor
 import Foundation
+import UIKit
 import YandexMobileAds
 
 @objc(YandexAdsPlugin)
@@ -11,6 +12,8 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "setUserConsent", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setAgeRestricted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setLocationTracking", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "prepareInterstitial", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "isInterstitialReady", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showInterstitial", returnType: CAPPluginReturnPromise),
@@ -21,6 +24,9 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private let interstitialAdLoader = InterstitialAdLoader()
     private let rewardedAdLoader = RewardedAdLoader()
+    private var bannerAdView: BannerAdView?
+    private var bannerLoadCall: CAPPluginCall?
+    private var bannerAdUnitID = ""
     private var interstitialAd: InterstitialAd?
     private var rewardedAd: RewardedAd?
     private var interstitialAdUnitID = ""
@@ -70,6 +76,42 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func setLocationTracking(_ call: CAPPluginCall) {
         runOnMain { self.setBoolean(call, setter: YandexAds.setLocationTracking) }
+    }
+
+    @objc func showBanner(_ call: CAPPluginCall) {
+        runOnMain { self.showBannerOnMain(call) }
+    }
+
+    @MainActor private func showBannerOnMain(_ call: CAPPluginCall) {
+        guard requireInitialized(call), let adUnitID = requireAdUnitID(call) else { return }
+        guard bannerLoadCall == nil else {
+            call.reject("A banner load is already in progress", "LOAD_IN_PROGRESS")
+            return
+        }
+        guard let viewController = bridge?.viewController else {
+            call.reject("iOS view controller is unavailable", "VIEW_CONTROLLER_UNAVAILABLE")
+            return
+        }
+
+        destroyBannerAd()
+        bannerAdUnitID = adUnitID
+        bannerLoadCall = call
+        let width = max(viewController.view.bounds.width, 1)
+        let bannerSize = BannerAdSize.sticky(containerWidth: width)
+        let banner = BannerAdView(adSize: bannerSize)
+        banner.delegate = self
+        bannerAdView = banner
+        banner.displayAtBottom(in: viewController.view)
+        banner.loadAd(with: AdRequest(adUnitID: adUnitID))
+    }
+
+    @objc func removeBanner(_ call: CAPPluginCall) {
+        runOnMain {
+            self.bannerLoadCall?.reject("Banner was removed", "BANNER_REMOVED")
+            self.bannerLoadCall = nil
+            self.destroyBannerAd()
+            call.resolve()
+        }
     }
 
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
@@ -221,6 +263,12 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
         interstitialAd = nil
     }
 
+    @MainActor private func destroyBannerAd() {
+        bannerAdView?.delegate = nil
+        bannerAdView?.removeFromSuperview()
+        bannerAdView = nil
+    }
+
     @MainActor private func destroyRewardedAd() {
         rewardedAd?.delegate = nil
         rewardedAd = nil
@@ -228,6 +276,35 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func runOnMain(_ block: @escaping @MainActor () -> Void) {
         DispatchQueue.main.async(execute: block)
+    }
+}
+
+@MainActor extension YandexAdsPlugin: BannerAdViewDelegate {
+    public func bannerAdViewDidLoad(_ bannerAdView: BannerAdView) {
+        let size = bannerAdView.adContentSize()
+        let result: [String: Any] = [
+            "adUnitId": bannerAdUnitID,
+            "width": size.width,
+            "height": size.height
+        ]
+        notifyListeners("bannerLoaded", data: result)
+        bannerLoadCall?.resolve(result)
+        bannerLoadCall = nil
+    }
+
+    public func bannerAdViewDidFailLoading(_ bannerAdView: BannerAdView, error: Error) {
+        notifyListeners("bannerFailedToLoad", data: errorEvent(bannerAdUnitID, error))
+        bannerLoadCall?.reject((error as NSError).localizedDescription, "BANNER_LOAD_FAILED", error)
+        bannerLoadCall = nil
+        destroyBannerAd()
+    }
+
+    public func bannerAdViewDidClick(_ bannerAdView: BannerAdView) {
+        notifyListeners("bannerClicked", data: adEvent(bannerAdUnitID))
+    }
+
+    public func bannerAdView(_ bannerAdView: BannerAdView, didTrackImpression impressionData: ImpressionData?) {
+        notifyListeners("bannerImpression", data: adEvent(bannerAdUnitID))
     }
 }
 

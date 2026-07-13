@@ -1,6 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { AdReadyResult, InitializeResult, YandexAdsPlugin } from './definitions';
+import type { AdReadyResult, BannerResult, InitializeResult, YandexAdsPlugin } from './definitions';
 
 export class YandexAdsWeb extends WebPlugin implements YandexAdsPlugin {
   private nativeOnly(): never {
@@ -20,6 +20,14 @@ export class YandexAdsWeb extends WebPlugin implements YandexAdsPlugin {
   }
 
   async setLocationTracking(): Promise<void> {
+    return this.nativeOnly();
+  }
+
+  async showBanner(): Promise<BannerResult> {
+    return this.nativeOnly();
+  }
+
+  async removeBanner(): Promise<void> {
     return this.nativeOnly();
   }
 

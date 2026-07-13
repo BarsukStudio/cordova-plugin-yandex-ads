@@ -19,6 +19,11 @@ export interface AdLoadOptions {
   adUnitId: string;
 }
 
+export interface BannerResult {
+  width: number;
+  height: number;
+}
+
 export interface AdReadyResult {
   ready: boolean;
 }
@@ -38,6 +43,10 @@ export interface RewardEvent extends AdEvent {
 }
 
 export type YandexAdsEventName =
+  | 'bannerLoaded'
+  | 'bannerClicked'
+  | 'bannerImpression'
+  | 'bannerFailedToLoad'
   | 'interstitialLoaded'
   | 'interstitialShown'
   | 'interstitialClicked'
@@ -59,6 +68,8 @@ export interface YandexAdsPlugin {
   setUserConsent(options: BooleanValue): Promise<void>;
   setAgeRestricted(options: BooleanValue): Promise<void>;
   setLocationTracking(options: BooleanValue): Promise<void>;
+  showBanner(options: AdLoadOptions): Promise<BannerResult>;
+  removeBanner(): Promise<void>;
   prepareInterstitial(options: AdLoadOptions): Promise<void>;
   isInterstitialReady(): Promise<AdReadyResult>;
   showInterstitial(): Promise<void>;
