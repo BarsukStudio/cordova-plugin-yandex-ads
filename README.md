@@ -42,11 +42,6 @@ On iOS, add the current Yandex `SKAdNetworkItems` list to the app's `Info.plist`
 ```ts
 import { YandexAds } from 'capacitor-plugin-yandex-ads';
 
-await YandexAds.addListener('rewarded', ({ amount, type }) => {
-  // Grant the reward only here.
-  console.info('Reward earned', amount, type);
-});
-
 await YandexAds.initialize({
   userConsent: true,
   ageRestricted: false,
@@ -55,13 +50,16 @@ await YandexAds.initialize({
 
 await YandexAds.showBanner({ adUnitId: 'demo-banner-yandex' });
 await YandexAds.prepareInterstitial({ adUnitId: 'demo-interstitial-yandex' });
-await YandexAds.showInterstitial();
+const interstitialResult = await YandexAds.showInterstitial();
 
 await YandexAds.prepareRewarded({ adUnitId: 'demo-rewarded-yandex' });
-await YandexAds.showRewarded();
+const rewardedResult = await YandexAds.showRewarded();
+if (rewardedResult.rewarded) {
+  // Grant the reward here.
+}
 ```
 
-`prepareInterstitial()` and `prepareRewarded()` resolve only after an ad has loaded. `showInterstitial()` and `showRewarded()` only start presentation; use lifecycle events for the actual result. Never grant a reward from the `showRewarded()` promise—grant it only from the `rewarded` event.
+`prepareInterstitial()` and `prepareRewarded()` resolve only after an ad has loaded. `showInterstitial()` and `showRewarded()` resolve after the fullscreen ad closes. A rewarded result is `true` only when the native Yandex SDK emitted its reward callback. Lifecycle events remain available for UI and analytics.
 
 The web implementation reports the plugin as unavailable. Route browser builds to a web ad provider before calling this API.
 
@@ -198,8 +196,10 @@ isInterstitialReady() => Promise<AdReadyResult>
 ### showInterstitial()
 
 ```typescript
-showInterstitial() => Promise<void>
+showInterstitial() => Promise<FullscreenAdResult>
 ```
+
+**Returns:** <code>Promise&lt;<a href="#fullscreenadresult">FullscreenAdResult</a>&gt;</code>
 
 --------------------
 
@@ -231,8 +231,10 @@ isRewardedReady() => Promise<AdReadyResult>
 ### showRewarded()
 
 ```typescript
-showRewarded() => Promise<void>
+showRewarded() => Promise<RewardedAdResult>
 ```
+
+**Returns:** <code>Promise&lt;<a href="#rewardedadresult">RewardedAdResult</a>&gt;</code>
 
 --------------------
 
@@ -341,6 +343,20 @@ removeAllListeners() => Promise<void>
 | Prop        | Type                 |
 | ----------- | -------------------- |
 | **`ready`** | <code>boolean</code> |
+
+
+#### FullscreenAdResult
+
+| Prop            | Type                 |
+| --------------- | -------------------- |
+| **`presented`** | <code>boolean</code> |
+
+
+#### RewardedAdResult
+
+| Prop           | Type                 |
+| -------------- | -------------------- |
+| **`rewarded`** | <code>boolean</code> |
 
 
 #### PluginListenerHandle

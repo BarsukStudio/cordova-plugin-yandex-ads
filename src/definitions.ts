@@ -28,6 +28,14 @@ export interface AdReadyResult {
   ready: boolean;
 }
 
+export interface FullscreenAdResult {
+  presented: boolean;
+}
+
+export interface RewardedAdResult extends FullscreenAdResult {
+  rewarded: boolean;
+}
+
 export interface AdEvent {
   adUnitId: string;
 }
@@ -72,10 +80,10 @@ export interface YandexAdsPlugin {
   removeBanner(): Promise<void>;
   prepareInterstitial(options: AdLoadOptions): Promise<void>;
   isInterstitialReady(): Promise<AdReadyResult>;
-  showInterstitial(): Promise<void>;
+  showInterstitial(): Promise<FullscreenAdResult>;
   prepareRewarded(options: AdLoadOptions): Promise<void>;
   isRewardedReady(): Promise<AdReadyResult>;
-  showRewarded(): Promise<void>;
+  showRewarded(): Promise<RewardedAdResult>;
 
   addListener(eventName: 'rewarded', listenerFunc: (event: RewardEvent) => void): Promise<PluginListenerHandle>;
   addListener(

@@ -1,6 +1,13 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { AdReadyResult, BannerResult, InitializeResult, YandexAdsPlugin } from './definitions';
+import type {
+  AdReadyResult,
+  BannerResult,
+  FullscreenAdResult,
+  InitializeResult,
+  RewardedAdResult,
+  YandexAdsPlugin,
+} from './definitions';
 
 export class YandexAdsWeb extends WebPlugin implements YandexAdsPlugin {
   private nativeOnly(): never {
@@ -39,7 +46,7 @@ export class YandexAdsWeb extends WebPlugin implements YandexAdsPlugin {
     return { ready: false };
   }
 
-  async showInterstitial(): Promise<void> {
+  async showInterstitial(): Promise<FullscreenAdResult> {
     return this.nativeOnly();
   }
 
@@ -51,7 +58,7 @@ export class YandexAdsWeb extends WebPlugin implements YandexAdsPlugin {
     return { ready: false };
   }
 
-  async showRewarded(): Promise<void> {
+  async showRewarded(): Promise<RewardedAdResult> {
     return this.nativeOnly();
   }
 }

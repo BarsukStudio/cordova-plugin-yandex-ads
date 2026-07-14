@@ -31,6 +31,9 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
     private var rewardedAd: RewardedAd?
     private var interstitialAdUnitID = ""
     private var rewardedAdUnitID = ""
+    private var interstitialShowCall: CAPPluginCall?
+    private var rewardedShowCall: CAPPluginCall?
+    private var rewardedEarned = false
     private var initialized = false
     private var initializing = false
     private var interstitialLoading = false
@@ -124,6 +127,10 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("An interstitial load is already in progress", "LOAD_IN_PROGRESS")
             return
         }
+        guard interstitialShowCall == nil else {
+            call.reject("An interstitial ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return
+        }
 
         destroyInterstitialAd()
         interstitialAdUnitID = adUnitID
@@ -163,8 +170,12 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("iOS view controller is unavailable", "VIEW_CONTROLLER_UNAVAILABLE")
             return
         }
+        guard interstitialShowCall == nil else {
+            call.reject("An interstitial ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return
+        }
+        interstitialShowCall = call
         ad.show(from: viewController)
-        call.resolve()
     }
 
     @objc func prepareRewarded(_ call: CAPPluginCall) {
@@ -175,6 +186,10 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
         guard requireInitialized(call), let adUnitID = requireAdUnitID(call) else { return }
         guard !rewardedLoading else {
             call.reject("A rewarded ad load is already in progress", "LOAD_IN_PROGRESS")
+            return
+        }
+        guard rewardedShowCall == nil else {
+            call.reject("A rewarded ad is already showing", "AD_SHOW_IN_PROGRESS")
             return
         }
 
@@ -216,8 +231,13 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("iOS view controller is unavailable", "VIEW_CONTROLLER_UNAVAILABLE")
             return
         }
+        guard rewardedShowCall == nil else {
+            call.reject("A rewarded ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return
+        }
+        rewardedEarned = false
+        rewardedShowCall = call
         ad.show(from: viewController)
-        call.resolve()
     }
 
     @MainActor private func setBoolean(_ call: CAPPluginCall, setter: (Bool) -> Void) {
@@ -315,6 +335,8 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public func interstitialAdDidDismiss(_ interstitialAd: InterstitialAd) {
         notifyListeners("interstitialDismissed", data: adEvent(interstitialAdUnitID))
+        interstitialShowCall?.resolve(["presented": true])
+        interstitialShowCall = nil
         destroyInterstitialAd()
     }
 
@@ -328,6 +350,8 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public func interstitialAd(_ interstitialAd: InterstitialAd, didFailToShow error: Error) {
         notifyListeners("interstitialFailedToShow", data: errorEvent(interstitialAdUnitID, error))
+        interstitialShowCall?.reject((error as NSError).localizedDescription, "INTERSTITIAL_SHOW_FAILED", error)
+        interstitialShowCall = nil
         destroyInterstitialAd()
     }
 }
@@ -339,6 +363,9 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public func rewardedAdDidDismiss(_ rewardedAd: RewardedAd) {
         notifyListeners("rewardedDismissed", data: adEvent(rewardedAdUnitID))
+        rewardedShowCall?.resolve(["presented": true, "rewarded": rewardedEarned])
+        rewardedShowCall = nil
+        rewardedEarned = false
         destroyRewardedAd()
     }
 
@@ -351,6 +378,7 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     public func rewardedAd(_ rewardedAd: RewardedAd, didReward reward: Reward) {
+        rewardedEarned = true
         notifyListeners("rewarded", data: [
             "adUnitId": rewardedAdUnitID,
             "amount": reward.amount,
@@ -360,6 +388,9 @@ public class YandexAdsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public func rewardedAd(_ rewardedAd: RewardedAd, didFailToShow error: Error) {
         notifyListeners("rewardedFailedToShow", data: errorEvent(rewardedAdUnitID, error))
+        rewardedShowCall?.reject((error as NSError).localizedDescription, "REWARDED_SHOW_FAILED", error)
+        rewardedShowCall = nil
+        rewardedEarned = false
         destroyRewardedAd()
     }
 }

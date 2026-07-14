@@ -39,11 +39,14 @@ class YandexAdsPlugin : Plugin() {
     private var interstitialAd: InterstitialAd? = null
     private var interstitialAdUnitId = ""
     private var interstitialLoadCall: PluginCall? = null
+    private var interstitialShowCall: PluginCall? = null
 
     private var rewardedAdLoader: RewardedAdLoader? = null
     private var rewardedAd: RewardedAd? = null
     private var rewardedAdUnitId = ""
     private var rewardedLoadCall: PluginCall? = null
+    private var rewardedShowCall: PluginCall? = null
+    private var rewardedEarned = false
 
     @PluginMethod
     fun initialize(call: PluginCall) = runOnMainThread {
@@ -147,6 +150,10 @@ class YandexAdsPlugin : Plugin() {
             call.reject("An interstitial load is already in progress", "LOAD_IN_PROGRESS")
             return@runOnMainThread
         }
+        if (interstitialShowCall != null) {
+            call.reject("An interstitial ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return@runOnMainThread
+        }
 
         destroyInterstitialAd()
         interstitialAdUnitId = adUnitId
@@ -187,23 +194,31 @@ class YandexAdsPlugin : Plugin() {
             call.reject("Android Activity is unavailable", "ACTIVITY_UNAVAILABLE")
             return@runOnMainThread
         }
+        if (interstitialShowCall != null) {
+            call.reject("An interstitial ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return@runOnMainThread
+        }
 
+        interstitialShowCall = call
         ad.setAdEventListener(object : InterstitialAdEventListener {
             override fun onAdShown() = notifyListeners("interstitialShown", adEvent(interstitialAdUnitId))
             override fun onAdClicked() = notifyListeners("interstitialClicked", adEvent(interstitialAdUnitId))
             override fun onAdImpression(impressionData: ImpressionData?) = notifyListeners("interstitialImpression", adEvent(interstitialAdUnitId))
             override fun onAdDismissed() {
                 notifyListeners("interstitialDismissed", adEvent(interstitialAdUnitId))
+                interstitialShowCall?.resolve(JSObject().put("presented", true))
+                interstitialShowCall = null
                 destroyInterstitialAd()
             }
 
             override fun onAdFailedToShow(adError: AdError) {
                 notifyListeners("interstitialFailedToShow", errorEvent(interstitialAdUnitId, null, adError.description))
+                interstitialShowCall?.reject(adError.description, "INTERSTITIAL_SHOW_FAILED")
+                interstitialShowCall = null
                 destroyInterstitialAd()
             }
         })
         ad.show(currentActivity)
-        call.resolve()
     }
 
     @PluginMethod
@@ -212,6 +227,10 @@ class YandexAdsPlugin : Plugin() {
         if (!requireInitialized(call)) return@runOnMainThread
         if (rewardedLoadCall != null) {
             call.reject("A rewarded ad load is already in progress", "LOAD_IN_PROGRESS")
+            return@runOnMainThread
+        }
+        if (rewardedShowCall != null) {
+            call.reject("A rewarded ad is already showing", "AD_SHOW_IN_PROGRESS")
             return@runOnMainThread
         }
 
@@ -254,12 +273,19 @@ class YandexAdsPlugin : Plugin() {
             call.reject("Android Activity is unavailable", "ACTIVITY_UNAVAILABLE")
             return@runOnMainThread
         }
+        if (rewardedShowCall != null) {
+            call.reject("A rewarded ad is already showing", "AD_SHOW_IN_PROGRESS")
+            return@runOnMainThread
+        }
 
+        rewardedEarned = false
+        rewardedShowCall = call
         ad.setAdEventListener(object : RewardedAdEventListener {
             override fun onAdShown() = notifyListeners("rewardedShown", adEvent(rewardedAdUnitId))
             override fun onAdClicked() = notifyListeners("rewardedClicked", adEvent(rewardedAdUnitId))
             override fun onAdImpression(impressionData: ImpressionData?) = notifyListeners("rewardedImpression", adEvent(rewardedAdUnitId))
             override fun onRewarded(reward: Reward) {
+                rewardedEarned = true
                 notifyListeners("rewarded", JSObject().apply {
                     put("adUnitId", rewardedAdUnitId)
                     put("amount", reward.amount)
@@ -269,16 +295,24 @@ class YandexAdsPlugin : Plugin() {
 
             override fun onAdDismissed() {
                 notifyListeners("rewardedDismissed", adEvent(rewardedAdUnitId))
+                rewardedShowCall?.resolve(JSObject().apply {
+                    put("presented", true)
+                    put("rewarded", rewardedEarned)
+                })
+                rewardedShowCall = null
+                rewardedEarned = false
                 destroyRewardedAd()
             }
 
             override fun onAdFailedToShow(adError: AdError) {
                 notifyListeners("rewardedFailedToShow", errorEvent(rewardedAdUnitId, null, adError.description))
+                rewardedShowCall?.reject(adError.description, "REWARDED_SHOW_FAILED")
+                rewardedShowCall = null
+                rewardedEarned = false
                 destroyRewardedAd()
             }
         })
         ad.show(currentActivity)
-        call.resolve()
     }
 
     override fun handleOnDestroy() {
@@ -286,9 +320,13 @@ class YandexAdsPlugin : Plugin() {
             bannerLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             interstitialLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             rewardedLoadCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
+            interstitialShowCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
+            rewardedShowCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             initializingCall?.reject("Plugin was destroyed", "PLUGIN_DESTROYED")
             interstitialLoadCall = null
             rewardedLoadCall = null
+            interstitialShowCall = null
+            rewardedShowCall = null
             bannerLoadCall = null
             initializingCall = null
             interstitialAdLoader?.cancelLoading()
