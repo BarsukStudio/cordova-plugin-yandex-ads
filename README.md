@@ -1,6 +1,8 @@
 # capacitor-plugin-yandex-ads
 
-Native Capacitor 8 plugin for Yandex Mobile Ads SDK 8.2.0 on Android and iOS.
+Native Capacitor 8 plugin for Yandex Mobile Ads SDK 8.2.0 on Android. On iOS it
+uses 8.2.1 through CocoaPods and 8.2.0 through Swift Package Manager, whose
+official repository does not yet publish an 8.2.1 tag.
 
 Supported in the first release:
 
@@ -24,9 +26,12 @@ The plugin intentionally contains no Cordova hooks, launcher activities, or `Mai
 Until the package is published to npm, install it directly from this repository:
 
 ```bash
-npm install github:BarsukStudio/cordova-plugin-yandex-ads
+npm install git+https://github.com/BarsukStudio/capacitor-plugin-yandex-ads.git
 npx cap sync
 ```
+
+Production applications should pin a release tag or an exact commit instead of
+following the repository branch.
 
 For local development:
 
@@ -43,7 +48,8 @@ On iOS, add the current Yandex `SKAdNetworkItems` list to the app's `Info.plist`
 import { YandexAds } from 'capacitor-plugin-yandex-ads';
 
 await YandexAds.initialize({
-  userConsent: true,
+  // Set true only after your own consent UI has collected valid consent.
+  userConsent: false,
   ageRestricted: false,
   locationTracking: false,
 });
@@ -80,7 +86,7 @@ The web implementation reports the plugin as unavailable. Route browser builds t
 * [`isRewardedReady()`](#isrewardedready)
 * [`showRewarded()`](#showrewarded)
 * [`addListener('rewarded', ...)`](#addlistenerrewarded-)
-* [`addListener('interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', ...)`](#addlistenerinterstitialfailedtoload--interstitialfailedtoshow--rewardedfailedtoload--rewardedfailedtoshow-)
+* [`addListener('bannerFailedToLoad' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', ...)`](#addlistenerbannerfailedtoload--interstitialfailedtoload--interstitialfailedtoshow--rewardedfailedtoload--rewardedfailedtoshow-)
 * [`addListener(YandexAdsEventName, ...)`](#addlisteneryandexadseventname-)
 * [`removeAllListeners()`](#removealllisteners)
 * [Interfaces](#interfaces)
@@ -255,16 +261,16 @@ addListener(eventName: 'rewarded', listenerFunc: (event: RewardEvent) => void) =
 --------------------
 
 
-### addListener('interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', ...)
+### addListener('bannerFailedToLoad' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', ...)
 
 ```typescript
-addListener(eventName: 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', listenerFunc: (event: AdErrorEvent) => void) => Promise<PluginListenerHandle>
+addListener(eventName: 'bannerFailedToLoad' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', listenerFunc: (event: AdErrorEvent) => void) => Promise<PluginListenerHandle>
 ```
 
-| Param              | Type                                                                                                                      |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>'interstitialFailedToLoad' \| 'interstitialFailedToShow' \| 'rewardedFailedToLoad' \| 'rewardedFailedToShow'</code> |
-| **`listenerFunc`** | <code>(event: <a href="#aderrorevent">AdErrorEvent</a>) =&gt; void</code>                                                 |
+| Param              | Type                                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'bannerFailedToLoad' \| 'interstitialFailedToLoad' \| 'interstitialFailedToShow' \| 'rewardedFailedToLoad' \| 'rewardedFailedToShow'</code> |
+| **`listenerFunc`** | <code>(event: <a href="#aderrorevent">AdErrorEvent</a>) =&gt; void</code>                                                                         |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
@@ -325,10 +331,11 @@ removeAllListeners() => Promise<void>
 
 #### BannerResult
 
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`width`**  | <code>number</code> |
-| **`height`** | <code>number</code> |
+| Prop           | Type                |
+| -------------- | ------------------- |
+| **`adUnitId`** | <code>string</code> |
+| **`width`**    | <code>number</code> |
+| **`height`**   | <code>number</code> |
 
 
 #### AdLoadOptions

@@ -20,6 +20,7 @@ export interface AdLoadOptions {
 }
 
 export interface BannerResult {
+  adUnitId: string;
   width: number;
   height: number;
 }
@@ -88,7 +89,11 @@ export interface YandexAdsPlugin {
   addListener(eventName: 'rewarded', listenerFunc: (event: RewardEvent) => void): Promise<PluginListenerHandle>;
   addListener(
     eventName:
-      'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow',
+      | 'bannerFailedToLoad'
+      | 'interstitialFailedToLoad'
+      | 'interstitialFailedToShow'
+      | 'rewardedFailedToLoad'
+      | 'rewardedFailedToShow',
     listenerFunc: (event: AdErrorEvent) => void,
   ): Promise<PluginListenerHandle>;
   addListener(eventName: YandexAdsEventName, listenerFunc: (event: AdEvent) => void): Promise<PluginListenerHandle>;

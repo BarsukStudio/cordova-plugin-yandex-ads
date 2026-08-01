@@ -1,6 +1,6 @@
 {
   "name": "capacitor-plugin-yandex-ads",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Native Capacitor plugin for Yandex Mobile Ads on Android and iOS",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -35,7 +35,8 @@
     "rewarded"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "verify": "npm run test:contract && npm run verify:ios && npm run verify:android && npm run verify:web",
+    "test:contract": "node scripts/package-contract-test.mjs",
     "verify:ios": "xcodebuild -scheme CapacitorPluginYandexAds -destination generic/platform=iOS",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",

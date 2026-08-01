@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '15.0'
   s.static_framework = true
   s.dependency 'Capacitor'
-  s.dependency 'YandexMobileAds', '8.2.0'
+  s.dependency 'YandexMobileAds', '8.2.1'
   s.swift_version = '5.9'
   s.pod_target_xcconfig = {
     'OTHER_LDFLAGS' => '-ObjC'
