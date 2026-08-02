@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+const gitignore = fs.readFileSync('.gitignore', 'utf8');
 const androidBuild = fs.readFileSync('android/build.gradle', 'utf8');
 const podspec = fs.readFileSync('CapacitorPluginYandexAds.podspec', 'utf8');
 const swiftPackage = fs.readFileSync('Package.swift', 'utf8');
@@ -10,6 +11,19 @@ const definitions = fs.readFileSync('src/definitions.ts', 'utf8');
 const readme = fs.readFileSync('README.md', 'utf8');
 
 assert.equal(packageJson.name, 'capacitor-plugin-yandex-ads');
+assert.doesNotMatch(
+  gitignore,
+  /^dist\/?$/m,
+  'dist must stay tracked so immutable GitHub source archives remain installable',
+);
+for (const builtEntry of [
+  'dist/esm/index.js',
+  'dist/esm/index.d.ts',
+  'dist/plugin.cjs.js',
+  'dist/plugin.js',
+]) {
+  assert.equal(fs.existsSync(builtEntry), true, `${builtEntry} must be present in GitHub archives`);
+}
 assert.equal(
   packageJson.repository?.url,
   'https://github.com/BarsukStudio/capacitor-plugin-yandex-ads.git',

@@ -1,0 +1,610 @@
+{
+  "api": {
+    "name": "YandexAdsPlugin",
+    "slug": "yandexadsplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "initialize",
+        "signature": "(options?: InitializeOptions | undefined) => Promise<InitializeResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "InitializeOptions | undefined"
+          }
+        ],
+        "returns": "Promise<InitializeResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "InitializeResult",
+          "InitializeOptions"
+        ],
+        "slug": "initialize"
+      },
+      {
+        "name": "setUserConsent",
+        "signature": "(options: BooleanValue) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "BooleanValue"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BooleanValue"
+        ],
+        "slug": "setuserconsent"
+      },
+      {
+        "name": "setAgeRestricted",
+        "signature": "(options: BooleanValue) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "BooleanValue"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BooleanValue"
+        ],
+        "slug": "setagerestricted"
+      },
+      {
+        "name": "setLocationTracking",
+        "signature": "(options: BooleanValue) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "BooleanValue"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BooleanValue"
+        ],
+        "slug": "setlocationtracking"
+      },
+      {
+        "name": "showBanner",
+        "signature": "(options: AdLoadOptions) => Promise<BannerResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "AdLoadOptions"
+          }
+        ],
+        "returns": "Promise<BannerResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BannerResult",
+          "AdLoadOptions"
+        ],
+        "slug": "showbanner"
+      },
+      {
+        "name": "removeBanner",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "removebanner"
+      },
+      {
+        "name": "prepareInterstitial",
+        "signature": "(options: AdLoadOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "AdLoadOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AdLoadOptions"
+        ],
+        "slug": "prepareinterstitial"
+      },
+      {
+        "name": "isInterstitialReady",
+        "signature": "() => Promise<AdReadyResult>",
+        "parameters": [],
+        "returns": "Promise<AdReadyResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AdReadyResult"
+        ],
+        "slug": "isinterstitialready"
+      },
+      {
+        "name": "showInterstitial",
+        "signature": "() => Promise<FullscreenAdResult>",
+        "parameters": [],
+        "returns": "Promise<FullscreenAdResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "FullscreenAdResult"
+        ],
+        "slug": "showinterstitial"
+      },
+      {
+        "name": "prepareRewarded",
+        "signature": "(options: AdLoadOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "AdLoadOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AdLoadOptions"
+        ],
+        "slug": "preparerewarded"
+      },
+      {
+        "name": "isRewardedReady",
+        "signature": "() => Promise<AdReadyResult>",
+        "parameters": [],
+        "returns": "Promise<AdReadyResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AdReadyResult"
+        ],
+        "slug": "isrewardedready"
+      },
+      {
+        "name": "showRewarded",
+        "signature": "() => Promise<RewardedAdResult>",
+        "parameters": [],
+        "returns": "Promise<RewardedAdResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "RewardedAdResult"
+        ],
+        "slug": "showrewarded"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'rewarded', listenerFunc: (event: RewardEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "",
+            "type": "'rewarded'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "",
+            "type": "(event: RewardEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "RewardEvent"
+        ],
+        "slug": "addlistenerrewarded-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: 'bannerFailedToLoad' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow', listenerFunc: (event: AdErrorEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "",
+            "type": "'bannerFailedToLoad' | 'interstitialFailedToLoad' | 'interstitialFailedToShow' | 'rewardedFailedToLoad' | 'rewardedFailedToShow'"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "",
+            "type": "(event: AdErrorEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "AdErrorEvent"
+        ],
+        "slug": "addlistenerbannerfailedtoload--interstitialfailedtoload--interstitialfailedtoshow--rewardedfailedtoload--rewardedfailedtoshow-"
+      },
+      {
+        "name": "addListener",
+        "signature": "(eventName: YandexAdsEventName, listenerFunc: (event: AdEvent) => void) => Promise<PluginListenerHandle>",
+        "parameters": [
+          {
+            "name": "eventName",
+            "docs": "",
+            "type": "YandexAdsEventName"
+          },
+          {
+            "name": "listenerFunc",
+            "docs": "",
+            "type": "(event: AdEvent) => void"
+          }
+        ],
+        "returns": "Promise<PluginListenerHandle>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "PluginListenerHandle",
+          "YandexAdsEventName",
+          "AdEvent"
+        ],
+        "slug": "addlisteneryandexadseventname-"
+      },
+      {
+        "name": "removeAllListeners",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "removealllisteners"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "InitializeResult",
+      "slug": "initializeresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "version",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "InitializeOptions",
+      "slug": "initializeoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "userConsent",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        },
+        {
+          "name": "ageRestricted",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        },
+        {
+          "name": "locationTracking",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        },
+        {
+          "name": "enableLogging",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean | undefined"
+        }
+      ]
+    },
+    {
+      "name": "BooleanValue",
+      "slug": "booleanvalue",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "value",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "BannerResult",
+      "slug": "bannerresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "adUnitId",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "width",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "height",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "AdLoadOptions",
+      "slug": "adloadoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "adUnitId",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "AdReadyResult",
+      "slug": "adreadyresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "ready",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "FullscreenAdResult",
+      "slug": "fullscreenadresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "presented",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "RewardedAdResult",
+      "slug": "rewardedadresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "rewarded",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "PluginListenerHandle",
+      "slug": "pluginlistenerhandle",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "remove",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "() => Promise<void>"
+        }
+      ]
+    },
+    {
+      "name": "RewardEvent",
+      "slug": "rewardevent",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "amount",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "AdErrorEvent",
+      "slug": "aderrorevent",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "code",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "message",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "AdEvent",
+      "slug": "adevent",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "adUnitId",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typeAliases": [
+    {
+      "name": "YandexAdsEventName",
+      "slug": "yandexadseventname",
+      "docs": "",
+      "types": [
+        {
+          "text": "'bannerLoaded'",
+          "complexTypes": []
+        },
+        {
+          "text": "'bannerClicked'",
+          "complexTypes": []
+        },
+        {
+          "text": "'bannerImpression'",
+          "complexTypes": []
+        },
+        {
+          "text": "'bannerFailedToLoad'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialLoaded'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialShown'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialClicked'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialImpression'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialDismissed'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialFailedToLoad'",
+          "complexTypes": []
+        },
+        {
+          "text": "'interstitialFailedToShow'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedLoaded'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedShown'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedClicked'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedImpression'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedDismissed'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedFailedToLoad'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewardedFailedToShow'",
+          "complexTypes": []
+        },
+        {
+          "text": "'rewarded'",
+          "complexTypes": []
+        }
+      ]
+    }
+  ],
+  "pluginConfigs": []
+}
